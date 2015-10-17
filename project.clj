@@ -22,5 +22,10 @@
           :dependencies [[org.clojure/tools.namespace "0.2.10"]]
           :jvm-opts ["-DAPP_LOG_APPENDER=repl"
                      "-DAPP_LOG_LEVEL=DEBUG"]}
+
    :test {:jvm-opts ["-DAPP_LOG_APPENDER=nop"
-                     "-DAPP_LOG_LEVEL=TRACE"]}})
+                     "-DAPP_LOG_LEVEL=TRACE"]}
+
+   :uberjar {:aot :all
+             :target-path "target/uberjar"
+             :main merkledag.server.main}})
