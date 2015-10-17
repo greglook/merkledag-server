@@ -11,7 +11,9 @@
   (:require
     [clojure.tools.logging :as log]
     [com.stuartsierra.component :as component]
-    [environ.core :refer [env]]))
+    [environ.core :refer [env]]
+    (merkledag.server
+      [web :as web])))
 
 
 ;; ## System Lifecycle
@@ -27,8 +29,25 @@
       (let [port (Integer/parseInt (env :port "8080"))
             server-url (env :server-url (str "http://localhost:" port))]
          (component/system-map
-           ; ...
-           )))))
+           :repo
+           {:url (env :repo-url "memory://")}
+
+           :controller
+           (component/using
+             {}
+             [:repo])
+
+           :web
+           (component/using
+             (web/jetty-server
+               :server (env :bind-addr "127.0.0.1")
+               :port port
+               :min-threads 2
+               :max-threads 5
+               :max-queued 25
+               :session-key (env :session-key))
+             [:controller])))))
+  :init)
 
 
 (defn start!
@@ -36,8 +55,7 @@
   []
   (when system
     (log/info "Starting component system...")
-    (alter-var-root #'system component/start)
-    (controller/rebuild-queues! (:controller system)))
+    (alter-var-root #'system component/start))
   :start)
 
 
