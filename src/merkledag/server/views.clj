@@ -43,4 +43,4 @@
   []
   (layout
     (head "Index")
-    []))
+    [:h1 "Hello, Merkledag"]))
