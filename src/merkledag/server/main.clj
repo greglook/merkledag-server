@@ -13,18 +13,14 @@
     [com.stuartsierra.component :as component]
     [environ.core :refer [env]]
     (merkledag.server
+      [core :as core]
       [web :as web])))
 
 
-;; ## System Lifecycle
-
-(def system nil)
-
-
 (defn init!
-  "Initialize the system for operation."
+  "Initialize the system from environment variables."
   []
-  (alter-var-root #'system
+  (alter-var-root #'core/system
     (constantly
       (let [port (Integer/parseInt (env :port "8080"))
             server-url (env :server-url (str "http://localhost:" port))]
@@ -50,31 +46,10 @@
   :init)
 
 
-(defn start!
-  "Runs the initialized system."
-  []
-  (when system
-    (log/info "Starting component system...")
-    (alter-var-root #'system component/start))
-  :start)
-
-
-(defn stop!
-  "Halts the running system."
-  []
-  (when system
-    (log/info "Stopping component system...")
-    (alter-var-root #'system component/stop))
-  :stop)
-
-
-
-;; ## Entry Point
-
 (defn -main []
   (init!)
   (.addShutdownHook
     (Runtime/getRuntime)
-    (Thread. ^Runnable stop! "server shutdown hook"))
-  (start!)
+    (Thread. ^Runnable core/stop! "System Shutdown Hook"))
+  (core/start!)
   (log/info "Server started, entering active mode..."))

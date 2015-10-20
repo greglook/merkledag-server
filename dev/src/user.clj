@@ -9,13 +9,14 @@
       [component :as component]
       [dependency :as dependency])
     [environ.core :refer [env]]
-    [merkledag.server.main :refer [system init! start! stop!]]))
+    (merkledag.server
+      [core :as core :refer [system start! stop!]]
+      [main :refer [init!]])))
 
 
 (defn go!
   "Initializes with the default config and starts the system."
   []
-  ; TODO: Configure the server somehow...
   (init!)
   (start!))
 
