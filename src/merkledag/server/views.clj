@@ -1,8 +1,7 @@
 (ns merkledag.server.views
   (:require
     (merkledag.server
-      [helpers :refer :all]
-      [urls :refer :all])))
+      [helpers :refer :all])))
 
 
 ;; ## Page Layout Components

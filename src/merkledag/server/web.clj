@@ -40,7 +40,6 @@
   "Constructs the fully-configured service handler."
   [controller session-key]
   (-> (app/ring-handler controller)
-      (app/wrap-url-context controller)
       (wrap-session
         {:store (cookie/cookie-store {:key session-key})})
       (wrap-middleware)))

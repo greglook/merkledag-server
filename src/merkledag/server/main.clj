@@ -26,7 +26,8 @@
             server-url (env :server-url (str "http://localhost:" port))]
          (component/system-map
            :repo
-           {:url (env :repo-url "memory://")}
+           {:url (env :repo-url "memory://")
+            #_ :store #_ (file-store (env :store-root "var/data"))}
 
            :controller
            (component/using
