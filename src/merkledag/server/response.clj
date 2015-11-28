@@ -14,8 +14,8 @@
 
 
 (defn not-found
-  [message]
-  (-> (r/response {:error :not-found, :message message})
+  [message & {:as extra}]
+  (-> (r/response (merge {:error :not-found, :message message} extra))
       (r/status 404)))
 
 

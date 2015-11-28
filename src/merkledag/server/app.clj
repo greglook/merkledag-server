@@ -40,6 +40,17 @@
                             stats)})))
 
 
+(defn get-block
+  [store request]
+  (if-let [id (:id (:route-params request))]
+    (let [mhash (multihash/decode id)
+          block (block/get store mhash)]
+      (if block
+        (r/response (block/open block))
+        (not-found "No such block" :id mhash)))
+    (bad-request "No block id provided")))
+
+
 
 (def sys-handlers
   {:sys/index
@@ -54,7 +65,7 @@
 
    :block/resource
    {:head   (nyi "stat-block")
-    :get    (nyi "get-block")
+    :get    (partial get-block store)
     :delete (nyi "delete-block")}})
 
 
