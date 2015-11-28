@@ -8,6 +8,9 @@
     [clojure.tools.namespace.repl :refer [refresh]]
     [com.stuartsierra.component :as component]
     [environ.core :refer [env]]
+    (merkledag
+      [core :as merkle]
+      [graph :as graph])
     (merkledag.server
       [core :as core :refer [system start! stop!]]
       [main :refer [init!]])))

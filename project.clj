@@ -25,6 +25,11 @@
    :ignore-ns #{clojure ring}
    :show-external true}
 
+  :whidbey
+  {:tag-types {'blocks.data.Block {'blocks.data.Block (partial into {})}
+               'merkledag.link.MerkleLink {'data/link (juxt :name :target :tsize)}
+               'multihash.core.Multihash {'data/hash 'multihash.core/base58}}}
+
   :profiles
   {:repl {:source-paths ["dev/src"]
           :dependencies [[org.clojure/tools.namespace "0.2.10"]]
