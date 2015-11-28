@@ -7,6 +7,7 @@
     [cemerick.url :as url]
     [cheshire.generate :as chgen]
     [clojure.tools.logging :as log]
+    [merkledag.core :as merkle]
     (merkledag.server
       [response :refer :all]
       [routes :as route]
@@ -36,7 +37,7 @@
         limit (if limit (min (Integer/parseInt limit) 100) 100)
         stats (block/list store :after after :limit limit)]
     (r/response {:entries (mapv
-                            #(assoc % :href (str (url/url server-root (route/path-for-block (:id %)))))
+                            #(assoc % :href (str (url/url server-root (route/path-for-node (:id %)))))
                             stats)})))
 
 
@@ -47,6 +48,17 @@
           block (block/get store mhash)]
       (if block
         (r/response (block/open block))
+        (not-found "No such block" :id mhash)))
+    (bad-request "No block id provided")))
+
+
+(defn get-node
+  [repo request]
+  (if-let [id (:id (:route-params request))]
+    (let [mhash (multihash/decode id)
+          node (merkle/get-node repo mhash)]
+      (if node
+        (render (views/show-node (get-in repo [:format :codec :codecs :edn :types]) node))
         (not-found "No such block" :id mhash)))
     (bad-request "No block id provided")))
 
@@ -75,7 +87,7 @@
    {:post (nyi "create-node")}
 
    :node/resource
-   {:get (nyi "get-node")}
+   {:get (partial get-node repo)}
 
    :node/links
    {:get (nyi "get-node-links")}

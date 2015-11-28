@@ -18,3 +18,8 @@
 (defn path-for-block
   [id]
   (bidi/path-for routes :block/resource :id (multihash/base58 id)))
+
+
+(defn path-for-node
+  [id]
+  (bidi/path-for routes :node/resource :id (multihash/base58 id)))
