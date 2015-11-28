@@ -13,9 +13,7 @@
       [keyword-params :refer [wrap-keyword-params]]
       [not-modified :refer [wrap-not-modified]]
       [params :refer [wrap-params]]
-      [resource :refer [wrap-resource]]
-      [session :refer [wrap-session]])
-    [ring.middleware.session.cookie :as cookie])
+      [resource :refer [wrap-resource]]))
   (:import
     org.eclipse.jetty.server.Server))
 
@@ -36,20 +34,11 @@
       (wrap-x-forwarded-for)))
 
 
-(defn- service-handler
-  "Constructs the fully-configured service handler."
-  [controller session-key]
-  (-> (app/ring-handler controller)
-      (wrap-session
-        {:store (cookie/cookie-store {:key session-key})})
-      (wrap-middleware)))
-
-
 
 ;; ## Web Server Component
 
 (defrecord JettyServer
-  [options session-key controller ^Server server]
+  [options ^Server server]
 
   component/Lifecycle
 
@@ -63,7 +52,7 @@
             (.start server))
           (log/info "JettyServer is already started"))
         this)
-      (let [handler (service-handler controller session-key)
+      (let [handler (wrap-middleware app/ring-handler)
             options (assoc options :join? false)]
         (log/info (str "Starting JettyServer on port " (:port options) "..."))
         (assoc this :server (jetty/run-jetty handler options)))))
@@ -80,6 +69,4 @@
 (defn jetty-server
   "Constructs a new web server component with the given options."
   [& {:as options}]
-  (map->JettyServer
-    {:options (dissoc options :session-key)
-     :session-key (:session-key options)}))
+  (map->JettyServer {:options options}))
