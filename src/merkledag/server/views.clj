@@ -9,8 +9,8 @@
   [:head
    [:title (str "MD" (when title (str \space title)))]
    [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
-   [:link {:rel "stylesheet" :href (local-path "css/site.css")}]
-   [:link {:rel "shortcut icon" :href (local-path "favicon.ico")}]
+   [:link {:rel "stylesheet" :href "/styles/site.css"}]
+   [:link {:rel "shortcut icon" :href "/favicon.ico"}]
    extra])
 
 
@@ -22,7 +22,7 @@
    [:body {:role "document"}
     ;(navbar)
     [:div.container {:role "main"} body-content]
-    [:script {:src (local-path "js/site.js")}]]])
+    [:script {:src "/scripts/site.js"}]]])
 
 
 
