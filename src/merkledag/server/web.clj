@@ -38,7 +38,7 @@
 ;; ## Web Server Component
 
 (defrecord JettyServer
-  [options ^Server server]
+  [options repo ^Server server]
 
   component/Lifecycle
 
@@ -50,7 +50,7 @@
           (log/info "Restarting JettyServer...")
           (.start server))
         this)
-      (let [handler (wrap-middleware app/ring-handler)
+      (let [handler (wrap-middleware (app/ring-handler repo))
             options (assoc options :join? false)]
         (log/info (str "Starting JettyServer on port " (:port options) "..."))
         (assoc this :server (jetty/run-jetty handler options)))))
@@ -67,4 +67,4 @@
 (defn jetty-server
   "Constructs a new web server component with the given options."
   [& {:as options}]
-  (JettyServer. options nil))
+  (JettyServer. options nil nil))

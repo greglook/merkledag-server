@@ -3,12 +3,22 @@
   controller actions."
   (:require
     [bidi.bidi :as bidi]
+    [blocks.core :as block]
+    [cemerick.url :as url]
+    [cheshire.generate :as chgen]
     [clojure.tools.logging :as log]
     (merkledag.server
       [response :refer :all]
-      [routes :refer [routes]]
+      [routes :as route]
       [views :as views])
+    [multihash.core :as multihash]
     [ring.util.response :as r]))
+
+
+(chgen/add-encoder java.net.URI chgen/encode-str)
+(chgen/add-encoder multihash.core.Multihash chgen/encode-str)
+
+(def server-root "http://localhost:8080")
 
 
 (defn- nyi
@@ -20,20 +30,37 @@
         (r/status 500))))
 
 
-(def resource-handlers
-  {:sys/index
-   {:get (fn [r] (render (views/index)))}
+(defn list-blocks
+  [store request]
+  (let [{:keys [after limit]} (:params request)
+        limit (if limit (min (Integer/parseInt limit) 100) 100)
+        stats (block/list store :after after :limit limit)]
+    (r/response {:entries (mapv
+                            #(assoc % :href (str (url/url server-root (route/path-for-block (:id %)))))
+                            stats)})))
 
-   :block/index
-   {:get  (nyi "list-blocks")
+
+
+(def sys-handlers
+  {:sys/index
+   {:get (fn [r] (render (views/index)))}})
+
+
+(defn block-handlers
+  [store]
+  {:block/index
+   {:get  (partial list-blocks store)
     :post (nyi "store-block")}
 
    :block/resource
    {:head   (nyi "stat-block")
     :get    (nyi "get-block")
-    :delete (nyi "delete-block")}
+    :delete (nyi "delete-block")}})
 
-   :node/index
+
+(defn node-handlers
+  [repo]
+  {:node/index
    {:post (nyi "create-node")}
 
    :node/resource
@@ -48,12 +75,16 @@
 
 (defn ring-handler
   "Constructs a new Ring handler implementing the application."
-  [request]
-  (if-let [route (bidi/match-route routes (:uri request))]
-    (if-let [method-map (get resource-handlers (:handler route))]
-      (if-let [handler (or (get method-map (:request-method request))
-                           (:any method-map))]
-        (handler (assoc request :route-params (:route-params route)))
-        (method-not-allowed (keys method-map)))
-      (not-found "No such resource"))
-    (not-found "No such resource")))
+  [repo]
+  (let [handlers (merge sys-handlers
+                        (block-handlers repo)
+                        (node-handlers repo))]
+    (fn handler
+      [request]
+      (let [route (bidi/match-route route/routes (:uri request))]
+        (if-let [method-map (and route (get handlers (:handler route)))]
+          (if-let [handler (or (get method-map (:request-method request))
+                               (:any method-map))]
+            (handler (assoc request :route-params (:route-params route)))
+            (method-not-allowed (keys method-map)))
+          (not-found "No such resource"))))))
