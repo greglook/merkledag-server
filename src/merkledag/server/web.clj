@@ -46,11 +46,9 @@
     [this]
     (if server
       (do
-        (if-not (.isStarted server)
-          (do
-            (log/info "Restarting JettyServer...")
-            (.start server))
-          (log/info "JettyServer is already started"))
+        (when-not (.isStarted server)
+          (log/info "Restarting JettyServer...")
+          (.start server))
         this)
       (let [handler (wrap-middleware app/ring-handler)
             options (assoc options :join? false)]
@@ -60,8 +58,8 @@
 
   (stop
     [this]
-    (log/info "Stopping JettyServer...")
     (when (and server (not (.isStopped server)))
+      (log/info "Stopping JettyServer...")
       (.stop server))
     this))
 
@@ -69,4 +67,4 @@
 (defn jetty-server
   "Constructs a new web server component with the given options."
   [& {:as options}]
-  (map->JettyServer {:options options}))
+  (JettyServer. options nil))
