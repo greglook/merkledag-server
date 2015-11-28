@@ -1,7 +1,4 @@
-(ns merkledag.server.views
-  (:require
-    (merkledag.server
-      [helpers :refer :all])))
+(ns merkledag.server.views)
 
 
 ;; ## Page Layout Components
