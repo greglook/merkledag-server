@@ -9,9 +9,13 @@
   "
   (:gen-class)
   (:require
+    [blocks.store.file :refer [file-store]]
     [clojure.tools.logging :as log]
     [com.stuartsierra.component :as component]
     [environ.core :refer [env]]
+    (merkledag
+      [core :as merkle]
+      [graph :as graph])
     (merkledag.server
       [core :as core]
       [web :as web])))
@@ -25,14 +29,13 @@
       (let [port (Integer/parseInt (env :port "8080"))
             server-url (env :server-url (str "http://localhost:" port))]
          (component/system-map
-           :repo
-           {:url (env :repo-url "memory://")
-            #_ :store #_ (file-store (env :store-root "var/data"))}
+           :store
+           (file-store (env :store-root "dev/blocks"))
 
-           :controller
+           :repo
            (component/using
-             {}
-             [:repo])
+             (graph/block-graph)
+             [:store])
 
            :web
            (component/using
@@ -43,7 +46,7 @@
                :max-threads 5
                :max-queued 25
                :session-key (env :session-key))
-             [:controller])))))
+             [:repo])))))
   :init)
 
 
