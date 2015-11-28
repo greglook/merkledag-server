@@ -7,8 +7,8 @@
   :deploy-branches ["master"]
 
   :dependencies
-  [[bidi "1.21.1" :exclusions [com.cemerick/clojurescript.test]]
-   [com.cemerick/url "0.1.1"]
+  [[bidi "1.21.1"]
+   [com.cemerick/url "0.1.1" :exclusions [com.cemerick/clojurescript.test]]
    [ch.qos.logback/logback-classic "1.1.3"]
    [com.stuartsierra/component "0.3.0"]
    [environ "1.0.1"]
