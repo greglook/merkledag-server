@@ -14,6 +14,7 @@
    [environ "1.0.1"]
    [mvxcvi/blocks "0.5.0"]
    [mvxcvi/merkledag-repo "0.1.0"] ; TODO: change to mvxcvi/merkledag
+   [mvxcvi/puget "1.0.0"]
    [org.clojure/clojure "1.7.0"]
    [org.clojure/tools.logging "0.3.1"]
    [ring/ring-core "1.4.0"]
