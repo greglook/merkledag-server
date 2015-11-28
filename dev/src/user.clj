@@ -1,5 +1,6 @@
 (ns user
   (:require
+    [blocks.core :as block]
     [clojure.java.io :as io]
     [clojure.repl :refer :all]
     [clojure.stacktrace :refer [print-cause-trace]]

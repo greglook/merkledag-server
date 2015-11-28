@@ -8,9 +8,11 @@
 
   :dependencies
   [[bidi "1.21.1" :exclusions [com.cemerick/clojurescript.test]]
+   [com.cemerick/url "0.1.1"]
    [ch.qos.logback/logback-classic "1.1.3"]
    [com.stuartsierra/component "0.3.0"]
    [environ "1.0.1"]
+   [mvxcvi/blocks "0.5.0"]
    [mvxcvi/merkledag-repo "0.1.0"] ; TODO: change to mvxcvi/merkledag
    [org.clojure/clojure "1.7.0"]
    [org.clojure/tools.logging "0.3.1"]
