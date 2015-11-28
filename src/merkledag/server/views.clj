@@ -1,4 +1,7 @@
-(ns merkledag.server.views)
+(ns merkledag.server.views
+  (:require
+    [bidi.bidi :as bidi]
+    [merkledag.server.routes :as routes]))
 
 
 ;; ## Page Layout Components
