@@ -18,6 +18,11 @@
    [ring/ring-jetty-adapter "1.4.0"]
    [ring-middleware-format "0.6.0"]]
 
+  :hiera
+  {:cluster-depth 2
+   :ignore-ns #{clojure ring}
+   :show-external true}
+
   :profiles
   {:repl {:source-paths ["dev/src"]
           :dependencies [[org.clojure/tools.namespace "0.2.10"]]
