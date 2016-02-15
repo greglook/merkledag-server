@@ -1,7 +1,7 @@
 (ns merkledag.server.views
   (:require
     [bidi.bidi :as bidi]
-    [merkledag.codec.edn :as edn]
+    [merkledag.codecs.edn :as edn]
     [merkledag.server.routes :as route]
     [multihash.core :as multihash]
     [puget.color :as color]

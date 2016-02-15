@@ -14,8 +14,7 @@
     [com.stuartsierra.component :as component]
     [environ.core :refer [env]]
     (merkledag
-      [core :as merkle]
-      [graph :as graph])
+      [core :as merkle])
     (merkledag.server
       [core :as core]
       [web :as web])))
@@ -34,7 +33,7 @@
 
            :repo
            (component/using
-             (graph/block-graph)
+             {:todo "merkledag repo"}
              [:store])
 
            :web

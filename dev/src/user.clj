@@ -9,8 +9,7 @@
     [com.stuartsierra.component :as component]
     [environ.core :refer [env]]
     (merkledag
-      [core :as merkle]
-      [graph :as graph])
+      [core :as merkle])
     (merkledag.server
       [core :as core :refer [system start! stop!]]
       [main :refer [init!]])))

@@ -12,14 +12,15 @@
    [ch.qos.logback/logback-classic "1.1.3"]
    [com.stuartsierra/component "0.3.0"]
    [environ "1.0.1"]
+   [hiccup "1.0.5"]
    [mvxcvi/blocks "0.5.0"]
-   [mvxcvi/merkledag-repo "0.1.0"] ; TODO: change to mvxcvi/merkledag
+   [mvxcvi/merkledag "0.2.0-SNAPSHOT"]
    [mvxcvi/puget "1.0.0"]
-   [org.clojure/clojure "1.7.0"]
+   [org.clojure/clojure "1.8.0"]
    [org.clojure/tools.logging "0.3.1"]
    [ring/ring-core "1.4.0"]
    [ring/ring-jetty-adapter "1.4.0"]
-   [ring-middleware-format "0.6.0"]]
+   [ring-middleware-format "0.7.0"]]
 
   :hiera
   {:cluster-depth 2
