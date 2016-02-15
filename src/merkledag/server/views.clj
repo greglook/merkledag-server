@@ -76,7 +76,8 @@
     (head (str "Node " (:id node)))
     [:h1 (multihash/base58 (:id node))]
     [:p (:id node)]
-    [:p "Size: " (:size node) " bytes"]
+    [:p [:strong "Size: "] (:size node) " bytes"]
+    [:p [:strong "Encoding: "] (interpose ", " (map #(vector :code % ) (:encoding node)))]
     (when (:links node)
       [:div
        [:h2 "Links"]
