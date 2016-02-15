@@ -58,7 +58,7 @@
     (let [mhash (multihash/decode id)
           node (merkle/get-node repo mhash)]
       (if node
-        (render (views/show-node (get-in repo [:format :codec :codecs :edn :types]) node))
+        (render (views/show-node (get-in merkle/block-codec [:codecs :node :mux :codecs :edn :types]) node))
         (not-found "No such block" :id mhash)))
     (bad-request "No block id provided")))
 
@@ -100,8 +100,8 @@
   "Constructs a new Ring handler implementing the application."
   [repo]
   (let [handlers (merge sys-handlers
-                        (block-handlers repo)
-                        (node-handlers repo))]
+                        (block-handlers (:store repo))
+                        (node-handlers (:store repo)))]
     (fn handler
       [request]
       (let [route (bidi/match-route route/routes (:uri request))]
