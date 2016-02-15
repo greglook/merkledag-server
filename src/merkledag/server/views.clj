@@ -50,9 +50,10 @@
                            [:group
                             (color/document printer :tag "#data/link")
                             " "
-                            ; TODO: tooltip with size?
                             [:span
-                             (format "<a href=\"%s\">" (route/path-for-node (:target link)))
+                             (format "<a href=\"%s\" title=\"%s bytes\">"
+                                     (route/path-for-node (:target link))
+                                     (:tsize link "?"))
                              (:name link)
                              "</a>"]])}
                         (edn/types->print-handlers types))})])
