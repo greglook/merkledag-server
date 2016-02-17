@@ -20,6 +20,7 @@
    [org.clojure/tools.logging "0.3.1"]
    [ring/ring-core "1.4.0"]
    [ring/ring-jetty-adapter "1.4.0"]
+   [ring-cors "0.1.7"]
    [ring-middleware-format "0.7.0"]]
 
   :hiera

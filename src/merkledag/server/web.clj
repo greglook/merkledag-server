@@ -9,6 +9,7 @@
     [ring.adapter.jetty :as jetty]
     (ring.middleware
       [content-type :refer [wrap-content-type]]
+      [cors :refer [wrap-cors]]
       [format :refer [wrap-restful-format]]
       [keyword-params :refer [wrap-keyword-params]]
       [not-modified :refer [wrap-not-modified]]
@@ -22,6 +23,9 @@
   "Wraps the application handler in common middleware."
   [handler]
   (-> handler
+      (wrap-cors :access-control-allow-origin #".*"
+                 :access-control-allow-headers ["Content-Type"]
+                 :access-control-allow-methods [:get])
       (wrap-request-logger 'merkledag.server.handler)
       (wrap-keyword-params)
       (wrap-params)
