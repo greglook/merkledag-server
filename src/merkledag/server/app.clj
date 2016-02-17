@@ -36,9 +36,7 @@
   (let [{:keys [after limit]} (:params request)
         limit (if limit (min (Integer/parseInt limit) 100) 100)
         stats (block/list store :after after :limit limit)]
-    (r/response {:entries (mapv
-                            #(assoc % :href (str (url/url server-root (route/path-for-node (:id %)))))
-                            stats)})))
+    (r/response {:entries (mapv #(dissoc % :source) stats)})))
 
 
 (defn get-block
