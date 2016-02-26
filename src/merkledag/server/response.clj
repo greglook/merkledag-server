@@ -7,25 +7,36 @@
     [ring.util.response :as r]))
 
 
+(defn error-response
+  [status error-key message]
+  (-> (r/response {:error error-key, :message message})
+      (r/status status)))
+
+
 (defn bad-request
   [message]
-  (-> (r/response {:error :bad-request, :message message})
-      (r/status 400)))
+  (error-response 400 :bad-request message))
 
 
 (defn not-found
   [message & {:as extra}]
-  (-> (r/response (merge {:error :not-found, :message message} extra))
-      (r/status 404)))
+  (-> (error-response 404 :not-found message)
+      (update-in [:body] merge extra)))
 
 
 (defn method-not-allowed
-  [& allowed]
-  (-> (r/response {:error :not-allowed, :message "Method not allowed on this resource"})
-      (r/header "Allow" (str/join ", " (map (comp str/upper-case name) allowed)))
-      (r/status 405)))
+  [allowed-methods]
+  (-> (error-response 405 :not-allowed "Method not allowed on this resource")
+      (r/header "Allow" (str/join ", " (map (comp str/upper-case name)
+                                            allowed-methods)))))
 
 
+(defn nyi
+  [code-name]
+  (error-response 500 :not-implemented (str code-name " is not yet implemented")))
+
+
+; TODO: deprecate this
 (defn render
   "Renders a Hiccup template data structure to HTML and returns a response with
   the correct content type."
