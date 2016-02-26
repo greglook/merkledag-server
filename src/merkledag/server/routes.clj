@@ -37,7 +37,7 @@
   [handlers]
   (fn handler
     [request]
-    (let [route (bidi/match-route route/routes (:uri request))]
+    (let [route (bidi/match-route routes (:uri request))]
       (if-let [method-map (and route (get handlers (:handler route)))]
         (if-let [handler (or (get method-map (:request-method request))
                              (:any method-map))]

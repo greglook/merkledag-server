@@ -27,6 +27,6 @@
 (defn ring-handler
   "Constructs a new Ring handler implementing the application."
   [repo root-url]
-  (-> (merge (block-handlers (:store repo) (str server-root "/blocks/"))
+  (-> (merge (block-handlers (:store repo) (str root-url "/blocks/"))
              (node-handlers (:store repo)))
       (route/route-handler)))
