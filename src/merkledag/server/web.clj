@@ -6,17 +6,21 @@
     (merkledag.server
       [app :as app]
       [middleware :refer :all])
+    [multihash.core :as multihash]
     [ring.adapter.jetty :as jetty]
     (ring.middleware
-      [content-type :refer [wrap-content-type]]
       [cors :refer [wrap-cors]]
       [format :refer [wrap-restful-format]]
       [keyword-params :refer [wrap-keyword-params]]
-      [not-modified :refer [wrap-not-modified]]
-      [params :refer [wrap-params]]
-      [resource :refer [wrap-resource]]))
+      [params :refer [wrap-params]]))
   (:import
+    multihash.core.Multihash
     org.eclipse.jetty.server.Server))
+
+
+(defmethod print-method Multihash
+  [value writer]
+  (print-method (tagged-literal 'data/hash (multihash/base58 value)) writer))
 
 
 (defn- wrap-middleware
@@ -29,12 +33,8 @@
       (wrap-request-logger 'merkledag.server.handler)
       (wrap-keyword-params)
       (wrap-params)
-      (wrap-resource "public")
-      (wrap-content-type)
-      (wrap-cache-control #{"text/css" "text/javascript"} :max-age 300)
-      (wrap-not-modified)
       (wrap-exception-handler)
-      (wrap-restful-format :formats [:json :edn])
+      (wrap-restful-format :formats [:edn]) ; TODO: replace with merkledag edn codec
       (wrap-x-forwarded-for)))
 
 
@@ -54,7 +54,7 @@
           (log/info "Restarting JettyServer...")
           (.start server))
         this)
-      (let [handler (wrap-middleware (app/ring-handler repo))
+      (let [handler (wrap-middleware (app/ring-handler repo "http://localhost:8080"))
             options (assoc options :join? false)]
         (log/info (str "Starting JettyServer on port " (:port options) "..."))
         (assoc this :server (jetty/run-jetty handler options)))))
