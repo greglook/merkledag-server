@@ -15,11 +15,11 @@
                    [:id "/data"] :node/data}]]])
 
 
-(defn path-for-block
+(defn block-path
   [id]
   (bidi/path-for routes :block/resource :id (multihash/base58 id)))
 
 
-(defn path-for-node
+(defn node-path
   [id]
   (bidi/path-for routes :node/resource :id (multihash/base58 id)))
