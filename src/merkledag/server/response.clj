@@ -3,7 +3,6 @@
   response maps."
   (:require
     [clojure.string :as str]
-    [hiccup.core :as hiccup]
     [ring.util.response :as r]))
 
 
@@ -59,18 +58,34 @@
       (r/header "Allow" (str/join ", " (map (comp str/upper-case name)
                                             allowed-methods)))))
 
-
 (defn nyi
   [code-name]
   (error-response 500 :not-implemented (str code-name " is not yet implemented")))
 
 
-; TODO: deprecate this
-(defn render
-  "Renders a Hiccup template data structure to HTML and returns a response with
-  the correct content type."
-  [template]
-  (-> (hiccup/html template)
-      (r/response)
-      (r/content-type "text/html")
-      (r/charset "utf-8")))
+
+;; ## Error Monad
+
+(defmacro wrap-try
+  [let-spec err-form body]
+  `(try
+     (if-let ~let-spec
+       ~body
+       (let [~'ex nil]
+         ~err-form))
+     (catch Exception ~'ex
+       ~err-form)))
+
+
+(defmacro try-request
+  [& forms]
+  (when-not (odd? (count forms))
+    (throw (IllegalArgumentException.
+             (str "try-request must be called with an odd number of forms."
+                  " Got: " (count forms)))))
+  (if (= 1 (count forms))
+    (first forms)
+    (let [[let-spec err-form & more] forms]
+      `(wrap-try
+         ~let-spec ~err-form
+         (try-request ~@more)))))
