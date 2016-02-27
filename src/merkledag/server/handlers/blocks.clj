@@ -69,35 +69,52 @@
 (defn handle-stat
   "Handles a request to look up metadata about a stored bolck."
   [store request]
-  (if-let [id (:id (:route-params request))]
-    (if-let [stats (block/stat store id)]
-      (-> (r/response "")
-          (assoc :headers (block-headers stats)))
-      (not-found (str "Block " id " not found in store")))
-    (bad-request "No block id provided")))
+  (try-request
+    [id (:id (:route-params request))]
+    (bad-request "No block id provided")
+
+    [id (multihash/decode id)]
+    (bad-request (str "Error parsing multihash: " ex))
+
+    [stats (block/stat store id)]
+    (not-found (str "Block " id " not found in store"))
+
+    (-> (r/response "")
+        (assoc :headers (block-headers stats)))))
 
 
 (defn handle-get
   "Handles a request to retrieve raw block content."
   [store request]
-  (if-let [id (:id (:route-params request))]
-    (if-let [block (block/get store (multihash/decode id))]
-      ; TODO: support ranged-open (Accept-Ranges: bytes / Content-Range: bytes 21010-47021/47022)
-      (-> (r/response (block/open block))
-          (assoc :headers (block-headers block)))
-      (not-found (str "Block " id " not found in store")))
-    (bad-request "No block id provided")))
+  (try-request
+    [id (:id (:route-params request))]
+    (bad-request "No block id provided")
+
+    [id (multihash/decode id)]
+    (bad-request (str "Error parsing multihash: " ex))
+
+    ; TODO: support ranged-open (Accept-Ranges: bytes / Content-Range: bytes 21010-47021/47022)
+    [block (block/get store id)]
+    (not-found (str "Block " id " not found in store"))
+
+    (-> (r/response (block/open block))
+        (assoc :headers (block-headers block)))))
 
 
 (defn handle-delete!
   "Handles a request to delete a block."
   [store request]
-  (if-let [id (:id (:route-params request))]
+  (try-request
+    [id (:id (:route-params request))]
+    (bad-request "No block id provided")
+
+    [id (multihash/decode id)]
+    (bad-request (str "Error parsing multihash: " ex))
+
     (if (block/delete! store (multihash/decode id))
       (-> (r/response "")
           (r/status 204))
-      (not-found (str "Block " id " not found in store")))
-    (bad-request "No block id provided")))
+      (not-found (str "Block " id " not found in store")))))
 
 
 

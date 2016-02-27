@@ -42,7 +42,7 @@
 ;; ## Web Server Component
 
 (defrecord JettyServer
-  [options repo ^Server server]
+  [root-url options repo ^Server server]
 
   component/Lifecycle
 
@@ -54,7 +54,7 @@
           (log/info "Restarting JettyServer...")
           (.start server))
         this)
-      (let [handler (wrap-middleware (app/ring-handler repo "http://localhost:8080"))
+      (let [handler (wrap-middleware (app/ring-handler repo root-url))
             options (assoc options :join? false)]
         (log/info (str "Starting JettyServer on port " (:port options) "..."))
         (assoc this :server (jetty/run-jetty handler options)))))
@@ -70,5 +70,5 @@
 
 (defn jetty-server
   "Constructs a new web server component with the given options."
-  [& {:as options}]
-  (JettyServer. options nil nil))
+  [root-url & {:as options}]
+  (JettyServer. root-url options nil nil))

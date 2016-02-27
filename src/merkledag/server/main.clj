@@ -27,25 +27,25 @@
     (constantly
       (let [port (Integer/parseInt (env :port "8080"))
             server-url (env :server-url (str "http://localhost:" port))]
-         (component/system-map
-           :store
-           (file-store (env :store-root "dev/blocks"))
+        (component/system-map
+          :store  ; TODO: make this more configurable
+          (file-store (env :store-root "dev/blocks"))
 
-           :repo
-           (component/using
-             {:todo "merkledag repo"}
-             [:store])
+          :repo
+          (component/using
+            {:todo "merkledag repo"}
+            [:store])
 
-           :web
-           (component/using
-             (web/jetty-server
-               :server (env :bind-addr "127.0.0.1")
-               :port port
-               :min-threads 2
-               :max-threads 5
-               :max-queued 25
-               :session-key (env :session-key))
-             [:repo])))))
+          :web
+          (component/using
+            (web/jetty-server
+              server-url
+              :server (env :bind-addr "127.0.0.1")
+              :port port
+              :min-threads 2
+              :max-threads 5
+              :max-queued 25)
+            [:repo])))))
   :init)
 
 
