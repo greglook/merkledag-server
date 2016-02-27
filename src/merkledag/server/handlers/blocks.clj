@@ -52,7 +52,7 @@
   (let [size (:content-length request)]
     (if (and size (pos? size))
       (let [block (block/store! store (:body request))
-            location (str base-url (multihash/base58 (:id block)))]
+            location (str (url/url base-url (multihash/base58 (:id block))))]
         (-> (r/response
               {:id (:id block)
                :size (:size block)
