@@ -1,6 +1,8 @@
 (ns merkledag.server.handlers.blocks
   "Ring handlers for raw block operations."
   (:require
+    [alphabase.base58 :as b58]
+    [alphabase.hex :as hex]
     [blocks.core :as block]
     [cemerick.url :as url]
     [clojure.string :as str]
@@ -28,10 +30,14 @@
   "Handles a request to list stats about the stored blocks."
   [store base-url request]
   (let [{:keys [after limit]} (:params request)
+        after (when after (hex/encode (b58/decode after)))
         max-limit 100
         limit (if limit (min (Integer/parseInt limit) max-limit) max-limit)
         stats (block/list store :after after :limit limit)]
-    (-> (r/response {:items (mapv #(assoc :href (str base-url (multihash/base58 (:id %)))) stats)})
+    (-> (r/response {:items (mapv #(-> %
+                                       (select-keys [:id :size :stored-at])
+                                       (assoc :href (str (url/url base-url (multihash/base58 (:id %))))))
+                                  stats)})
         (cond->
           (<= limit (count stats))
             (r/header "Link" (->> {:next (assoc base-url :query {:after (multihash/base58 (:id (last stats)))
