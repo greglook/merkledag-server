@@ -35,7 +35,7 @@
   (fn [{:keys [uri remote-addr request-method] :as request}]
     (let [start (System/nanoTime)
           method (str/upper-case (name request-method))]
-      (log/log logger-ns :debug nil
+      (log/log logger-ns :trace nil
                (format "%s %s %s" remote-addr method uri))
       (let [{:keys [status headers] :as response} (handler request)
             elapsed (/ (- (System/nanoTime) start) 1000000.0)
