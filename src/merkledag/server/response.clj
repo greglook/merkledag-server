@@ -67,6 +67,10 @@
 ;; ## Error Monad
 
 (defmacro wrap-try
+  "Combines an `if-let` and `try`/`catch` form to wrap the given assignment. If
+  the symbol bound in the `let-spec` is nil or an exception in thrown, then
+  `err-form` is evaluated with the exception (if any) bound to `ex`. Otherwise,
+  `body` is evaluated in the scope of the let form."
   [let-spec err-form body]
   `(try
      (if-let ~let-spec
@@ -78,6 +82,9 @@
 
 
 (defmacro try-request
+  "Chains multiple `wrap-try` forms together. The child forms should consist of
+  a number of pairs of let specs and error forms, followed by a final success
+  form."
   [& forms]
   (when-not (odd? (count forms))
     (throw (IllegalArgumentException.
