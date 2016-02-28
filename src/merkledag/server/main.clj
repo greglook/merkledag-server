@@ -17,7 +17,7 @@
       [core :as merkle])
     (merkledag.server
       [core :as core]
-      [web :as web])))
+      [jetty :as jetty])))
 
 
 (defn init!
@@ -36,9 +36,9 @@
             {:todo "merkledag repo"}
             [:store])
 
-          :web
+          :server
           (component/using
-            (web/jetty-server
+            (jetty/jetty-server
               server-url
               :server (env :bind-addr "127.0.0.1")
               :port port

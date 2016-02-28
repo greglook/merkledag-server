@@ -1,4 +1,4 @@
-(ns merkledag.server.web
+(ns merkledag.server.jetty
   "This namespace provides a Jetty component for serving the app."
   (:require
     [clojure.tools.logging :as log]
