@@ -8,8 +8,11 @@ This project implements a REST API for interacting with a
 
 ## API Resources
 
-The REST API is divided into sets of resources. First are the block routes,
-which let the client interact directly with raw block data:
+The REST API is divided into sets of resources.
+
+### Blocks
+
+The block routes let clients interact directly with raw block data.
 
 ```
 GET    /blocks/       List blocks (with pagination)
@@ -19,8 +22,11 @@ GET    /blocks/:id    Get a block's content
 DELETE /blocks/:id    Remove a block from the store (may not be allowed)
 ```
 
-Next are the nodes resources, which read blocks and attempt to interpret the
-data inside.
+### Nodes
+
+The node routes read blocks and attempt to interpret the data inside. Getting a
+node returns the metadata (such as encoding and links) as headers and the node
+content as the response body.
 
 ```
 POST   /nodes/             Create a node by providing structured data.
@@ -29,8 +35,13 @@ GET    /nodes/:id          Get the links and content of a node
 GET    /nodes/:id/:path*   Traverse link paths and return the final node.
 ```
 
-The 'refs' routes provide mutable references into the graph, which can be
-updated by processes over time.
+For example, getting a standard `/merkledag/v1` node would return an EDN body
+with a `Content-Type: application/vnd.merkledag.v1+edn` header.
+
+### Refs
+
+The ref routes provide mutable references into the graph which can be updated
+over time. These are conceptually similar to git's branches or tags.
 
 ```
 GET    /refs/         List named reference pointers.
@@ -38,6 +49,8 @@ GET    /refs/:name    Resolve the given reference; returns the hash of the targe
 PUT    /refs/:name    Create or update a pointer.
 DELETE /refs/:name    Remove a reference pointer.
 ```
+
+### System
 
 Finally, there are a few system routes which provide information and control
 over the server:
