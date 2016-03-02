@@ -67,7 +67,7 @@
 ;; ## Block Handlers
 
 (defn handle-stat
-  "Handles a request to look up metadata about a stored bolck."
+  "Handles a request to look up metadata about a stored block."
   [store request]
   (try-request
     [id (:id (:route-params request))]

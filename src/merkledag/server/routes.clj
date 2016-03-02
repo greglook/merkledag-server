@@ -11,9 +11,8 @@
         ["blocks/" {"" :block/index
                     [:id] :block/resource}]
         ["nodes/" {"" :node/index
-                   [:id] :node/resource
-                   [:id "/links"] :node/links
-                   [:id "/data"] :node/data}]]])
+                   ; TODO: path logic?
+                   [:id] :node/resource}]]])
 
 
 
