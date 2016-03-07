@@ -2,11 +2,29 @@
   "This namespace defines a Ring handler binding URL paths to data lookup and
   controller actions."
   (:require
+    [bidi.bidi :as bidi]
+    [cemerick.url :as url]
     (merkledag.server
       [response :refer :all]
-      [routes :as route])
+      [routes :as routes])
     (merkledag.server.handlers
-      [blocks :refer [block-handlers]])))
+      [blocks :as bh])))
+
+
+;; ## Handler Maps
+
+(defn block-handlers
+  "Returns a map of block route keys to method maps from http verbs to actual
+  request handlers."
+  [base-url store]
+  {:block/index
+   {:get  (partial bh/handle-list store base-url)
+    :post (partial bh/handle-store! store base-url)}
+
+   :block/resource
+   {:head   (partial bh/handle-stat store)
+    :get    (partial bh/handle-get store)
+    :delete (partial bh/handle-delete! store)}})
 
 
 (defn node-handlers

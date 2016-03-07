@@ -115,21 +115,3 @@
       (-> (r/response "")
           (r/status 204))
       (not-found (str "Block " id " not found in store")))))
-
-
-
-;; ## Handler Constructor
-
-(defn block-handlers
-  "Returns a map of block route keys to method maps from http verbs to actual
-  request handlers."
-  [store base-url]
-  (let [base-url (url/url base-url)]
-    {:block/index
-     {:get  (partial handle-list store base-url)
-      :post (partial handle-store! store base-url)}
-
-     :block/resource
-     {:head   (partial handle-stat store)
-      :get    (partial handle-get store)
-      :delete (partial handle-delete! store)}}))
