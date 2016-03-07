@@ -11,8 +11,7 @@
     (merkledag
       [core :as merkle])
     (merkledag.server
-      [core :as core :refer [system start! stop!]]
-      [main :refer [init!]])))
+      [core :as core :refer [system init! start! stop!]])))
 
 
 (defn go!

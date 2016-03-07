@@ -44,4 +44,4 @@
 
    :uberjar {:aot :all
              :target-path "target/uberjar"
-             :main merkledag.server.main}})
+             :main merkledag.server.core}})
