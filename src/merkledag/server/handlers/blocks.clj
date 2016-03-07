@@ -125,10 +125,10 @@
   request handlers."
   [base-url store]
   {:block/index
-   {:get  (partial bh/handle-list store base-url)
-    :post (partial bh/handle-store! store base-url)}
+   {:get  (partial handle-list store base-url)
+    :post (partial handle-store! store base-url)}
 
    :block/resource
-   {:head   (partial bh/handle-stat store)
-    :get    (partial bh/handle-get store)
-    :delete (partial bh/handle-delete! store)}})
+   {:head   (partial handle-stat store)
+    :get    (partial handle-get store)
+    :delete (partial handle-delete! store)}})
