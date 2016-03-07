@@ -7,12 +7,19 @@
 
 
 (def routes
-  ["/" [["" :sys/index]
-        ["blocks/" {"" :block/index
-                    [:id] :block/resource}]
-        ["nodes/" {"" :node/index
-                   ; TODO: path logic?
-                   [:id] :node/resource}]]])
+  ["" [["/" :sys/index]
+       ["/sys"
+        {"/info" :sys/info
+         "/ping" :sys/ping}]
+       ["/blocks"
+        {"/" :block/index
+         ["/" :id] :block/resource}]
+       ["/nodes"
+        {"/" :node/index
+         ["/" :id "/" [#".*" :path]] :node/resource}]
+       ["/refs"
+        {"/" :refs/index
+         ["/" :name] :refs/resource}]]])
 
 
 
