@@ -24,7 +24,7 @@
    [ring-middleware-format "0.7.0"]]
 
   :hiera
-  {:cluster-depth 2
+  {:cluster-depth 3
    :ignore-ns #{clojure ring}
    :show-external false}
 

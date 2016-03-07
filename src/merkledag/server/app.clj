@@ -5,45 +5,12 @@
     [bidi.bidi :as bidi]
     [cemerick.url :as url]
     (merkledag.server
-      [response :refer :all]
       [routes :as routes])
     (merkledag.server.handlers
-      [blocks :as bh])))
+      [blocks :refer [block-handlers]]
+      [nodes :refer [node-handlers]]
+      [response :refer :all])))
 
-
-;; ## Handler Maps
-
-(defn block-handlers
-  "Returns a map of block route keys to method maps from http verbs to actual
-  request handlers."
-  [base-url store]
-  {:block/index
-   {:get  (partial bh/handle-list store base-url)
-    :post (partial bh/handle-store! store base-url)}
-
-   :block/resource
-   {:head   (partial bh/handle-stat store)
-    :get    (partial bh/handle-get store)
-    :delete (partial bh/handle-delete! store)}})
-
-
-(defn node-handlers
-  [repo]
-  {:node/index
-   {:post (nyi "create-node")}
-
-   :node/resource
-   {:get (nyi "get-node")}
-
-   :node/links
-   {:get (nyi "get-node-links")}
-
-   :node/data
-   {:get (nyi "get-node-data")}})
-
-
-
-;; ## Handler Constructors
 
 (defn route-handler
   "Constructs a new Ring handler which routes the request using bidi.
@@ -81,5 +48,6 @@
   [repo root-url]
   (route-handler
     routes/routes
+    ; TODO: find better way to pass route constructors into handlers
     (merge (block-handlers (str root-url "/blocks/") (:store repo))
-           (node-handlers (:store repo)))))
+           (node-handlers (str root-url "/nodes/") (:store repo)))))

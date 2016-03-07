@@ -61,11 +61,10 @@
 (defn node-handlers
   "Returns a map of node route keys to method maps from http verbs to actual
   request handlers."
-  [store base-url]
-  (let [base-url (url/url base-url)]
-    {:node/index
-     {:post (partial handle-create! store base-url)}
+  [base-url store]
+  {:node/index
+   {:post (partial handle-create! store base-url)}
 
-     :node/resource
-     {:head (partial handle-stat store)
-      :get  (partial handle-get store)}}))
+   :node/resource
+   {:head (partial handle-stat store)
+    :get  (partial handle-get store)}})
