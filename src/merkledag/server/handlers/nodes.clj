@@ -5,7 +5,7 @@
     [blocks.core :as block]
     [cemerick.url :as url]
     [clojure.string :as str]
-    [merkledag.server.response :refer :all]
+    [merkledag.server.handlers.response :refer :all]
     [multihash.core :as multihash]
     [ring.util.response :as r]))
 

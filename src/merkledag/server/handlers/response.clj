@@ -1,4 +1,4 @@
-(ns merkledag.server.response
+(ns merkledag.server.handlers.response
   "This namespace provides some simple helper functions for generating Ring
   response maps."
   (:require
