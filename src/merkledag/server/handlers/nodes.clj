@@ -5,12 +5,11 @@
     [blocks.core :as block]
     [cemerick.url :as url]
     [clojure.string :as str]
+    [merkledag.core :as merkle]
     [merkledag.server.handlers.response :refer :all]
     [multihash.core :as multihash]
     [ring.util.response :as r]))
 
-
-;; ## Collection Handlers
 
 (defn handle-create!
   "Handles a request to create a new node from structured data."
@@ -20,23 +19,6 @@
       ; TODO: parse body as EDN, serialize into node
       (error-response 500 :not-implemented "Not Yet Implemented")
       (error-response 411 :no-content "Cannot store block with no content"))))
-
-
-
-;; ## Node Handlers
-
-(defn handle-stat
-  "Handles a request to look up metadata about a stored node."
-  [store request]
-  (try-request
-    [id (:id (:route-params request))]
-    (bad-request "No block id provided")
-
-    [id (multihash/decode id)]
-    (bad-request (str "Error parsing multihash: " ex))
-
-    ; TODO: implement
-    (error-response 500 :not-implemented "Not Yet Implemented")))
 
 
 (defn handle-get
@@ -49,10 +31,14 @@
     [id (multihash/decode id)]
     (bad-request (str "Error parsing multihash: " ex))
 
-    ; TODO: something with :path
+    [node (merkle/get-node store id)]
+    (if ex
+      (throw ex)
+      (not-found (str "Block " id " not found in store")))
 
-    ; TODO: implement
-    (error-response 500 :not-implemented "Not Yet Implemented")))
+    ; TODO: something with :path?
+
+    (r/response (select-keys node [:id :size :encoding :links :data]))))
 
 
 
@@ -66,5 +52,4 @@
    {:post (partial handle-create! store base-url)}
 
    :node/resource
-   {:head (partial handle-stat store)
-    :get  (partial handle-get store)}})
+   {:get (partial handle-get store)}})
