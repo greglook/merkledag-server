@@ -14,13 +14,25 @@
       [keyword-params :refer [wrap-keyword-params]]
       [params :refer [wrap-params]]))
   (:import
+    merkledag.link.MerkleLink
     multihash.core.Multihash
-    org.eclipse.jetty.server.Server))
+    org.eclipse.jetty.server.Server
+    org.joda.time.DateTime))
 
 
 (defmethod print-method Multihash
   [value writer]
   (print-method (tagged-literal 'data/hash (multihash/base58 value)) writer))
+
+
+(defmethod print-method MerkleLink
+  [value writer]
+  (print-method (tagged-literal 'data/link ((juxt :target :name :tsize) value)) writer))
+
+
+(defmethod print-method DateTime
+  [value writer]
+  (print-method (tagged-literal 'inst (str value)) writer))
 
 
 (defn- wrap-middleware

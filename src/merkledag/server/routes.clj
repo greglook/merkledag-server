@@ -15,6 +15,7 @@
          ["/" :id] :block/resource}]
        ["/nodes"
         {"/" :node/index
+         ["/" :id] :node/resource
          ["/" :id "/" [#".*" :path]] :node/resource}]
        ["/refs"
         {"/" :refs/index
