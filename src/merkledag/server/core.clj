@@ -13,10 +13,9 @@
     [clojure.tools.logging :as log]
     [com.stuartsierra.component :as component]
     [environ.core :refer [env]]
-    (merkledag
-      [core :as merkle])
-    (merkledag.server
-      [jetty :as jetty])))
+    [merkledag.core :as merkle]
+    [merkledag.refs.memory :refer [memory-tracker]]
+    [merkledag.server.jetty :as jetty]))
 
 
 (def system
@@ -35,10 +34,13 @@
           :store  ; TODO: make this more configurable
           (file-store (env :store-root "dev/blocks"))
 
+          :refs
+          (memory-tracker)
+
           :repo
           (component/using
-            {:todo "merkledag repo"}
-            [:store])
+            (merkle/graph-repo :codec @merkle/block-codec)
+            [:store :refs])
 
           :server
           (component/using
