@@ -24,19 +24,15 @@ DELETE /blocks/:id    Remove a block from the store (may not be allowed)
 
 ### Nodes
 
-The node routes read blocks and attempt to interpret the data inside. Getting a
-node returns the metadata (such as encoding and links) as headers and the node
-content as the response body.
+The node routes read blocks and attempt to interpret the data inside. Node
+resources include the id and size of the encoded block, the list of multicodec
+headers read from the block, and the encoded links and data if present.
 
 ```
 POST   /nodes/             Create a node by providing structured data.
-HEAD   /nodes/:id          Get the storage metadata, encoding, and links of a block without the content
 GET    /nodes/:id          Get the links and content of a node
 GET    /nodes/:id/:path*   Traverse link paths and return the final node.
 ```
-
-For example, getting a standard `/merkledag/v1` node would return an EDN body
-with a `Content-Type: application/vnd.merkledag.v1+edn` header.
 
 ### Refs
 
