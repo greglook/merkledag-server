@@ -40,10 +40,11 @@ The ref routes provide mutable references into the graph which can be updated
 over time. These are conceptually similar to git's branches or tags.
 
 ```
-GET    /refs/         List named reference pointers.
-GET    /refs/:name    Resolve the given reference; returns the hash of the target node.
-PUT    /refs/:name    Create or update a pointer.
-DELETE /refs/:name    Remove a reference pointer.
+GET    /refs/           List named reference pointers.
+GET    /refs/:name      Resolve the given reference.
+GET    /refs/:name/log  Return historical values for the reference.
+PUT    /refs/:name      Create or update a pointer.
+DELETE /refs/:name      Remove a reference pointer.
 ```
 
 ### System
