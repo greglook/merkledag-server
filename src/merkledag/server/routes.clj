@@ -19,7 +19,8 @@
          ["/" :id "/" [#".*" :path]] :node/resource}]
        ["/refs"
         {"/" :refs/index
-         ["/" :name] :refs/resource}]]])
+         ["/" :name] :refs/resource
+         ["/" :name "/log"] :refs/log}]]])
 
 
 
