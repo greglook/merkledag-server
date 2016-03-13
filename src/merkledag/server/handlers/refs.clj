@@ -40,7 +40,14 @@
 (defn handle-log
   "Handles a request to retrieve the history of versions for a ref."
   [tracker request]
-  '...)
+  (try-request
+    [rname (:name (:route-params request))]
+    (bad-request "Missing ref name in route-params")
+
+    [history (refs/list-ref-history tracker rname)]
+    (not-found (str "Ref " rname " not found in tracker"))
+
+    (r/response {:items (vec history)})))
 
 
 (defn handle-set!
@@ -64,18 +71,13 @@
 (defn handle-delete!
   "Handles a request to delete a block."
   [tracker request]
-  #_
   (try-request
-    [id (:id (:route-params request))]
-    (bad-request "No block id provided")
+    [rname (:name (:route-params request))]
+    (bad-request "Missing ref name in route-params")
 
-    [id (multihash/decode id)]
-    (bad-request (str "Error parsing multihash: " ex))
-
-    (if (block/delete! store (multihash/decode id))
-      (-> (r/response "")
-          (r/status 204))
-      (not-found (str "Block " id " not found in store")))))
+    (if (refs/delete-ref! tracker rname)
+      (-> (r/response "") (r/status 204))
+      (not-found (str "Ref " rname " not found in tracker")))))
 
 
 
