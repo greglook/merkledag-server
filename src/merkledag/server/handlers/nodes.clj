@@ -29,7 +29,7 @@
     [id (:id (:route-params request))]
     (bad-request "No block id provided")
 
-    [id (doto (multihash/decode id) prn)]
+    [id (multihash/decode id)]
     (bad-request (str "Error parsing multihash: " ex))
 
     [node (merkle/get-node repo id)]
