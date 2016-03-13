@@ -14,11 +14,13 @@
 (defn handle-create!
   "Handles a request to create a new node from structured data."
   [store base-url request]
-  (let [size (:content-length request)]
-    (if (and size (pos? size))
-      ; TODO: parse body as EDN, serialize into node
-      (error-response 500 :not-implemented "Not Yet Implemented")
-      (error-response 411 :no-content "Cannot store block with no content"))))
+  (try-request
+    [has-content? (pos? (:content-length request))]
+    (error-response 411 :no-content "Cannot store block with no content")
+
+    (let [node (merkle/node (:links (:body request)) (:data (:body request)))]
+      (block/put! store node)
+      (r/redirect (str base-url "/" (multihash/base58 (:id node))) :see-other))))
 
 
 (defn handle-get
