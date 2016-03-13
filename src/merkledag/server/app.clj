@@ -51,5 +51,5 @@
     routes/routes
     ; TODO: find better way to pass route constructors into handlers
     (merge (block-handlers (str root-url "/blocks/") (:store repo))
-           (node-handlers  (str root-url "/nodes/")  (:store repo))
+           (node-handlers  (str root-url "/nodes/")  repo)
            (ref-handlers   (str root-url "/refs/")   (:refs repo)))))
