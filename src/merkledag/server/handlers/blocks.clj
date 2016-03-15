@@ -23,6 +23,11 @@
         (assoc "Last-Modified" (format-date stored-at)))))
 
 
+(defn block-url
+  [base block]
+  (str (url/url base (multihash/base58 (:id block)))))
+
+
 
 ;; ## Collection Handlers
 
@@ -36,7 +41,7 @@
         stats (block/list store :after after :limit limit)]
     (-> (r/response {:items (mapv #(-> %
                                        (select-keys [:id :size :stored-at])
-                                       (assoc :href (str (url/url base-url (multihash/base58 (:id %))))))
+                                       (assoc :href (block-url base-url %)))
                                   stats)})
         (cond->
           (<= limit (count stats))
@@ -52,7 +57,7 @@
   (let [size (:content-length request)]
     (if (and size (pos? size))
       (let [block (block/store! store (:body request))
-            location (str (url/url base-url (multihash/base58 (:id block))))]
+            location (block-url base-url block)]
         (-> (r/response
               {:id (:id block)
                :size (:size block)

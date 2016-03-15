@@ -9,6 +9,11 @@
     [ring.util.response :as r]))
 
 
+(defn ref-url
+  [base ref]
+  (str (url/url base (:name ref))))
+
+
 (defn handle-list
   "Handles a request to list references stored in a tracker."
   [tracker base-url request]
@@ -18,7 +23,7 @@
         refs (refs/list-refs tracker {:include-nil include-nil, :limit limit})]
     (r/response {:items (mapv #(-> %
                                    (select-keys [:name :value :version :time])
-                                   (assoc :href (str (url/url base-url (:name %)))))
+                                   (assoc :href (ref-url base-url %)))
                               refs)})))
 
 

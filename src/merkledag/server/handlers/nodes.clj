@@ -11,6 +11,11 @@
     [ring.util.response :as r]))
 
 
+(defn node-url
+  [base node]
+  (str (url/url base (multihash/base58 (:id node)))))
+
+
 (defn handle-create!
   "Handles a request to create a new node from structured data."
   [repo base-url request]
@@ -19,7 +24,7 @@
     (error-response 411 :no-content "Cannot store block with no content")
 
     (let [node (merkle/put-node! repo (:links (:body request)) (:data (:body request)))]
-      (r/redirect (str base-url "/" (multihash/base58 (:id node))) :see-other))))
+      (r/redirect (node-url base-url node) :see-other))))
 
 
 (defn handle-get
