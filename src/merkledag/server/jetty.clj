@@ -41,7 +41,7 @@
   (-> handler
       (wrap-cors :access-control-allow-origin #".*"
                  :access-control-allow-headers ["Content-Type"]
-                 :access-control-allow-methods [:get])
+                 :access-control-allow-methods [:get :put :post])
       (wrap-request-logger 'merkledag.server.handler)
       (wrap-keyword-params)
       (wrap-params)

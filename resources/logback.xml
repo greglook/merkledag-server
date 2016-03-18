@@ -20,4 +20,5 @@
 
   <logger name="merkledag.server" level="${APP_LOG_LEVEL:-INFO}"/>
   <logger name="org.eclipse.jetty" level="INFO"/>
+  <logger name="blocks" level="DEBUG"/>
 </configuration>
