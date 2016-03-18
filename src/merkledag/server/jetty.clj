@@ -39,9 +39,9 @@
   "Wraps the application handler in common middleware."
   [handler]
   (-> handler
-      (wrap-cors :access-control-allow-origin #".*"
-                 :access-control-allow-headers ["Content-Type"]
-                 :access-control-allow-methods [:get :put :post])
+      (wrap-cors :access-control-allow-origin [#".*"]
+                 :access-control-allow-headers [:content-type]
+                 :access-control-allow-methods [:get :put :post :delete])
       (wrap-request-logger 'merkledag.server.handler)
       (wrap-keyword-params)
       (wrap-params)
