@@ -9,7 +9,10 @@
   "
   (:gen-class)
   (:require
-    [blocks.store.file :refer [file-store]]
+    (blocks.store
+      [cache :refer [cache-store]]
+      [file :refer [file-store]]
+      [memory :refer [memory-store]])
     [clojure.tools.logging :as log]
     [com.stuartsierra.component :as component]
     [environ.core :refer [env]]
@@ -31,8 +34,19 @@
       (let [port (Integer/parseInt (env :port "8080"))
             server-url (env :server-url (str "http://localhost:" port))]
         (component/system-map
-          :store  ; TODO: make this more configurable
+          :file-store
           (file-store (env :store-root "dev/blocks"))
+
+          :memory-store
+          (memory-store)
+
+          :store  ; TODO: make this more configurable
+          (component/using
+            (let [mb #(* % 1024 1024)]
+              (cache-store (mb 512)
+                :max-block-size (mb 8)))
+            {:primary :file-store
+             :cache :memory-store})
 
           :refs
           (memory-tracker)
