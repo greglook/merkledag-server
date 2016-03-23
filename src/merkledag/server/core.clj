@@ -17,7 +17,7 @@
     [com.stuartsierra.component :as component]
     [environ.core :refer [env]]
     [merkledag.core :as merkle]
-    [merkledag.refs.memory :refer [memory-tracker]]
+    [merkledag.refs.file :refer [file-tracker]]
     [merkledag.server.jetty :as jetty]))
 
 
@@ -49,7 +49,7 @@
              :cache :memory-store})
 
           :refs
-          (memory-tracker)
+          (file-tracker (env :tracker-file "dev/refs.tsv"))
 
           :repo
           (component/using
@@ -76,6 +76,8 @@
     (throw (IllegalStateException. "Cannot start uninitialized system")))
   (log/info "Starting component system...")
   (alter-var-root #'system component/start)
+  ; TODO: extend component lifecycle to file tracker instead of calling this here.
+  (merkledag.refs.file/load-history! (:refs system))
   :start)
 
 
