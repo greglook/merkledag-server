@@ -39,15 +39,22 @@
     (r/response (select-keys node [:id :size :encoding :links :data]))))
 
 
+(defn handle-put!
+  "Handles a request to update node content."
+  [repo request]
+  (throw (ex-data "Not Yet Implemented" {})))
+
+
 
 ;; ## Handler Constructor
 
-(defn node-handlers
+(defn data-handlers
   "Returns a map of node route keys to method maps from http verbs to actual
   request handlers."
   [repo]
-  {:node/index
+  {:data/index
    {:post (partial handle-create! repo)}
 
-   :node/resource
-   {:get (partial handle-get repo)}})
+   :data/resource
+   {:get (partial handle-get repo)
+    :put (partial handle-put! repo)}})
