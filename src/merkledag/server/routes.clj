@@ -2,6 +2,7 @@
   "Route definition for the application."
   (:require
     [bidi.bidi :as bidi]
+    [cemerick.url :as url]
     [clojure.string :as str]
     [multihash.core :as multihash]))
 
@@ -69,3 +70,43 @@
    (bidi/path-for routes :data/resource
                   :id (multihash/base58 id)
                   :path (str/join "/" path))))
+
+
+
+;; ## URL Helpers
+
+(def ^:dynamic *root-url*
+  "http://localhost")
+
+
+(defn wrap-url-context
+  "Binds `*root-url*` to the given base before executing the wrapped ring
+  handler."
+  [handler base]
+  (fn url-context-handler
+    [request]
+    (binding [*root-url* base]
+      (handler request))))
+
+
+(defn block-url
+  ([]
+   (url/url *root-url* (block-path)))
+  ([id]
+   (url/url *root-url* (block-path id))))
+
+
+(defn ref-url
+  ([]
+   (url/url *root-url* (ref-path)))
+  ([name]
+   (url/url *root-url* (ref-path name))))
+
+
+(defn data-url
+  ([]
+   (url/url *root-url* (data-path)))
+  ([id]
+   (url/url *root-url* (data-path id)))
+  ([id & path]
+   (url/url *root-url* (apply data-path id path))))

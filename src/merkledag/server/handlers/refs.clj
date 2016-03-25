@@ -5,25 +5,21 @@
     [clojure.string :as str]
     [merkledag.refs :as refs]
     [merkledag.server.handlers.response :refer :all]
+    [merkledag.server.routes :refer [ref-url]]
     [multihash.core :as multihash]
     [ring.util.response :as r]))
 
 
-(defn ref-url
-  [base ref]
-  (str (url/url base (:name ref))))
-
-
 (defn handle-list
   "Handles a request to list references stored in a tracker."
-  [tracker base-url request]
+  [tracker request]
   (let [{:keys [include-nil limit]} (:params request)
         max-limit 100
         limit (if limit (min (Integer/parseInt limit) max-limit) max-limit)
         refs (refs/list-refs tracker {:include-nil include-nil, :limit limit})]
     (r/response {:items (mapv #(-> %
                                    (select-keys [:name :value :version :time])
-                                   (assoc :href (ref-url base-url %)))
+                                   (assoc :href (str (ref-url (:name %)))))
                               refs)})))
 
 
@@ -91,9 +87,9 @@
 (defn ref-handlers
   "Returns a map of ref route keys to method maps from http verbs to actual
   request handlers."
-  [base-url tracker]
+  [tracker]
   {:ref/index
-   {:get (partial handle-list tracker base-url)}
+   {:get (partial handle-list tracker)}
 
    :ref/resource
    {:get    (partial handle-get tracker)

@@ -4,14 +4,13 @@
   (:require
     [bidi.bidi :as bidi]
     [cemerick.url :as url]
-    (merkledag.server
-      [routes :as routes])
     (merkledag.server.handlers
       [blocks :refer [block-handlers]]
-      [nodes :refer [node-handlers]]
+      [data :refer [data-handlers]]
       [refs :refer [ref-handlers]]
       [response :refer :all]
-      [sys :refer [sys-handlers]])))
+      [sys :refer [sys-handlers]])
+    [merkledag.server.routes :as routes]))
 
 
 (defn route-handler
@@ -48,10 +47,12 @@
 (defn ring-handler
   "Constructs a new Ring handler implementing the application."
   [repo root-url]
-  (route-handler
-    routes/routes
-    ; TODO: find better way to pass route constructors into handlers
-    (merge (block-handlers (str root-url "/blocks/") (:store repo))
-           (node-handlers  (str root-url "/nodes/")  repo)
-           (ref-handlers   (str root-url "/refs/")   (:refs repo))
-           (sys-handlers))))
+  (route/wrap-url-context
+    (route-handler
+      routes/routes
+      ; TODO: find better way to pass route constructors into handlers
+      (merge (block-handlers (:store repo))
+             (ref-handlers (:refs repo))
+             (data-handlers repo)
+             (sys-handlers)))
+    root-url))

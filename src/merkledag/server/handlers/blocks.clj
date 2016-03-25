@@ -7,6 +7,7 @@
     [cemerick.url :as url]
     [clojure.string :as str]
     [merkledag.server.handlers.response :refer :all]
+    [merkledag.server.routes :refer [block-url]]
     [multihash.core :as multihash]
     [ring.util.response :as r]))
 
@@ -23,17 +24,12 @@
         (assoc "Last-Modified" (format-date stored-at)))))
 
 
-(defn block-url
-  [base block]
-  (str (url/url base (multihash/base58 (:id block)))))
-
-
 
 ;; ## Collection Handlers
 
 (defn handle-list
   "Handles a request to list stats about the stored blocks."
-  [store base-url request]
+  [store request]
   (let [{:keys [after limit]} (:params request)
         after (when after (hex/encode (b58/decode after)))
         max-limit 100
@@ -41,23 +37,24 @@
         stats (block/list store :after after :limit limit)]
     (-> (r/response {:items (mapv #(-> %
                                        (select-keys [:id :size :stored-at])
-                                       (assoc :href (block-url base-url %)))
+                                       (assoc :href (str (block-url (:id %)))))
                                   stats)})
         (cond->
           (<= limit (count stats))
-            (r/header "Link" (->> {:next (assoc base-url :query {:after (multihash/base58 (:id (last stats)))
-                                                                 :limit limit})}
+            (r/header "Link" (->> {:next (assoc (block-url)
+                                                :query {:after (multihash/base58 (:id (last stats)))
+                                                        :limit limit})}
                                   (map #(format "<%s>; rel=\"%s\"" (val %) (name (key %))))
                                   (str/join ",")))))))
 
 
 (defn handle-store!
   "Handles a request to store a new block."
-  [store base-url request]
+  [store request]
   (let [size (:content-length request)]
     (if (and size (pos? size))
       (let [block (block/store! store (:body request))
-            location (block-url base-url block)]
+            location (block-url block)]
         (-> (r/response
               {:id (:id block)
                :size (:size block)
@@ -128,10 +125,10 @@
 (defn block-handlers
   "Returns a map of block route keys to method maps from http verbs to actual
   request handlers."
-  [base-url store]
+  [store]
   {:block/index
-   {:get  (partial handle-list store base-url)
-    :post (partial handle-store! store base-url)}
+   {:get  (partial handle-list store)
+    :post (partial handle-store! store)}
 
    :block/resource
    {:head   (partial handle-stat store)

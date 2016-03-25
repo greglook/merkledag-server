@@ -1,30 +1,22 @@
-(ns merkledag.server.handlers.nodes
+(ns merkledag.server.handlers.data
   "Ring handlers for merkledag node operations."
   (:require
-    [alphabase.base58 :as b58]
-    [blocks.core :as block]
-    [cemerick.url :as url]
-    [clojure.string :as str]
     [merkledag.core :as merkle]
     [merkledag.server.handlers.response :refer :all]
+    [merkledag.server.routes :refer [data-url]]
     [multihash.core :as multihash]
     [ring.util.response :as r]))
 
 
-(defn node-url
-  [base node]
-  (str (url/url base (multihash/base58 (:id node)))))
-
-
 (defn handle-create!
   "Handles a request to create a new node from structured data."
-  [repo base-url request]
+  [repo request]
   (try-request
     [has-content? (pos? (:content-length request))]
     (error-response 411 :no-content "Cannot store block with no content")
 
     (let [node (merkle/put-node! repo (:links (:body request)) (:data (:body request)))]
-      (r/redirect (node-url base-url node) :see-other))))
+      (r/redirect (data-url (:id node)) :see-other))))
 
 
 (defn handle-get
@@ -53,9 +45,9 @@
 (defn node-handlers
   "Returns a map of node route keys to method maps from http verbs to actual
   request handlers."
-  [base-url repo]
+  [repo]
   {:node/index
-   {:post (partial handle-create! repo base-url)}
+   {:post (partial handle-create! repo)}
 
    :node/resource
    {:get (partial handle-get repo)}})
