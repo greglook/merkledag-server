@@ -21,6 +21,45 @@
     [merkledag.server.jetty :as jetty]))
 
 
+(defn create-system
+  []
+  (let [port (Integer/parseInt (env :port "8080"))
+        server-url (env :server-url (str "http://localhost:" port))]
+    (component/system-map
+      :file-store  ; TODO: make this more configurable
+      (file-store (env :store-root "dev-repo/blocks"))
+
+      :memory-store
+      (memory-store)
+
+      :store
+      (component/using
+        (let [mb #(* % 1024 1024)]
+          (cache-store (mb 512)
+            :max-block-size (mb 8)))
+        {:primary :file-store
+         :cache :memory-store})
+
+      :refs
+      (file-tracker (env :tracker-file "dev-repo/refs.tsv"))
+
+      :repo
+      (component/using
+        (merkle/graph-repo :codec @merkle/block-codec)
+        [:store :refs])
+
+      :server
+      (component/using
+        (jetty/jetty-server
+          :root-url server-url
+          :server (env :bind-addr "127.0.0.1")
+          :port port
+          :min-threads 2
+          :max-threads 5
+          :max-queued 25)
+        [:repo]))))
+
+
 (def system
   "Currently-running server system."
   nil)
@@ -29,43 +68,7 @@
 (defn init!
   "Initialize the system from environment variables."
   []
-  (alter-var-root #'system
-    (constantly
-      (let [port (Integer/parseInt (env :port "8080"))
-            server-url (env :server-url (str "http://localhost:" port))]
-        (component/system-map
-          :file-store
-          (file-store (env :store-root "dev-repo/blocks"))
-
-          :memory-store
-          (memory-store)
-
-          :store  ; TODO: make this more configurable
-          (component/using
-            (let [mb #(* % 1024 1024)]
-              (cache-store (mb 512)
-                :max-block-size (mb 8)))
-            {:primary :file-store
-             :cache :memory-store})
-
-          :refs
-          (file-tracker (env :tracker-file "dev-repo/refs.tsv"))
-
-          :repo
-          (component/using
-            (merkle/graph-repo :codec @merkle/block-codec)
-            [:store :refs])
-
-          :server
-          (component/using
-            (jetty/jetty-server
-              server-url
-              :server (env :bind-addr "127.0.0.1")
-              :port port
-              :min-threads 2
-              :max-threads 5
-              :max-queued 25)
-            [:repo])))))
+  (alter-var-root #'system (constantly (create-system)))
   :init)
 
 
