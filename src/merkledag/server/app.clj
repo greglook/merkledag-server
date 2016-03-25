@@ -10,9 +10,41 @@
       [refs :refer [ref-handlers]]
       [response :refer :all]
       [sys :refer [sys-handlers]])
-    [merkledag.server.routes :as routes]))
+    [merkledag.server.middleware :refer :all]
+    [merkledag.server.routes :as route]
+    [multihash.core :as multihash]
+    (ring.middleware
+      [cors :refer [wrap-cors]]
+      [format :refer [wrap-restful-format]]
+      [keyword-params :refer [wrap-keyword-params]]
+      [params :refer [wrap-params]]))
+  (:import
+    merkledag.link.MerkleLink
+    multihash.core.Multihash
+    org.joda.time.DateTime))
 
 
+;; ## Print Methods
+
+(defmethod print-method Multihash
+  [value writer]
+  (print-method (tagged-literal 'data/hash (multihash/base58 value)) writer))
+
+
+(defmethod print-method MerkleLink
+  [value writer]
+  (print-method (tagged-literal 'data/link ((juxt :target :name :tsize) value)) writer))
+
+
+(defmethod print-method DateTime
+  [value writer]
+  (print-method (tagged-literal 'inst (str value)) writer))
+
+
+
+;; ## Route Handler
+
+; TODO: move this to a common lib
 (defn route-handler
   "Constructs a new Ring handler which routes the request using bidi.
 
@@ -44,15 +76,28 @@
         (not-found "No such resource")))))
 
 
-(defn ring-handler
+(defn app-handler
   "Constructs a new Ring handler implementing the application."
-  [repo root-url]
-  (route/wrap-url-context
-    (route-handler
-      routes/routes
-      ; TODO: find better way to pass route constructors into handlers
-      (merge (block-handlers (:store repo))
-             (ref-handlers (:refs repo))
-             (data-handlers repo)
-             (sys-handlers)))
-    root-url))
+  [repo]
+  (route-handler
+    route/routes
+    (merge (block-handlers (:store repo))
+           (ref-handlers (:refs repo))
+           (data-handlers repo)
+           (sys-handlers))))
+
+
+(defn service-handler
+  "Wraps the application handler in common middleware."
+  [root-url repo]
+  (-> (app-handler repo)
+      (route/wrap-url-context root-url)
+      (wrap-cors :access-control-allow-origin [#".*"]
+                 :access-control-allow-headers [:content-type]
+                 :access-control-allow-methods [:get :put :post :delete])
+      (wrap-request-logger "merkledag.server.app")
+      (wrap-keyword-params)
+      (wrap-params)
+      (wrap-exception-handler)
+      (wrap-restful-format :formats [:edn]) ; TODO: replace with merkledag edn codec
+      (wrap-x-forwarded-for)))
