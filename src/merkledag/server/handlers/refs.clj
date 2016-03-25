@@ -92,13 +92,13 @@
   "Returns a map of ref route keys to method maps from http verbs to actual
   request handlers."
   [base-url tracker]
-  {:refs/index
+  {:ref/index
    {:get (partial handle-list tracker base-url)}
 
-   :refs/resource
+   :ref/resource
    {:get    (partial handle-get tracker)
     :put    (partial handle-set! tracker)
     :delete (partial handle-delete! tracker)}
 
-   :refs/log
+   :ref/log
    {:get (partial handle-log tracker)}})
