@@ -34,7 +34,7 @@
                'multihash.core.Multihash {'data/hash 'multihash.core/base58}}}
 
   :profiles
-  {:repl {:source-paths ["dev/src"]
+  {:repl {:source-paths ["dev"]
           :dependencies [[org.clojure/tools.namespace "0.2.10"]]
           :jvm-opts ["-DAPP_LOG_APPENDER=repl"
                      "-DAPP_LOG_LEVEL=DEBUG"]}

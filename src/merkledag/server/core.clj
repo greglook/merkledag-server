@@ -35,7 +35,7 @@
             server-url (env :server-url (str "http://localhost:" port))]
         (component/system-map
           :file-store
-          (file-store (env :store-root "dev/blocks"))
+          (file-store (env :store-root "dev-repo/blocks"))
 
           :memory-store
           (memory-store)
@@ -49,7 +49,7 @@
              :cache :memory-store})
 
           :refs
-          (file-tracker (env :tracker-file "dev/refs.tsv"))
+          (file-tracker (env :tracker-file "dev-repo/refs.tsv"))
 
           :repo
           (component/using

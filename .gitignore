@@ -2,7 +2,7 @@
 /classes
 /checkouts
 /doc
-/dev/blocks
+/dev-repo
 pom.xml
 pom.xml.asc
 *.jar
