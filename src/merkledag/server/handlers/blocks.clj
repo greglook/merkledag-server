@@ -54,12 +54,12 @@
   (let [size (:content-length request)]
     (if (and size (pos? size))
       (let [block (block/store! store (:body request))
-            location (block-url block)]
+            location (block-url (:id block))]
         (-> (r/response
               {:id (:id block)
                :size (:size block)
                :stored-at (:stored-at (block/meta-stats block))
-               :href location})
+               :href (str location)})
             (r/status 201)
             (r/header "Location" location)))
       (error-response 411 :no-content "Cannot store block with no content"))))
