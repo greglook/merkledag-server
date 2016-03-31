@@ -7,38 +7,34 @@
     [multihash.core :as multihash]))
 
 
-(def sys-routes
-  ["/sys"
-   {"/info" :sys/info
-    "/ping" :sys/ping}])
+(def sys-paths
+  {"/info" :sys/info
+   "/ping" :sys/ping})
 
 
-(def block-routes
-  ["/blocks"
-   {"/" :block/index
-    ["/" :id] :block/resource}])
+(def block-paths
+  {"/"       :block/index
+   ["/" :id] :block/resource})
 
 
-(def ref-routes
-  ["/refs"
-   {"/" :ref/index
-    ["/" :name] :ref/resource
-    ["/" :name "/log"] :ref/log}])
+(def ref-paths
+  {"/"                :ref/index
+   ["/" :name]        :ref/resource
+   ["/" :name "/log"] :ref/log})
 
 
-(def data-routes
-  ["/data"
-   {"/" :data/index
-    ["/" :id-or-ref] :data/resource
-    ["/" :id-or-ref "/" [#".*" :path]] :data/resource}])
+(def data-paths
+  {"/"                                :data/index
+   ["/" :id-or-ref]                   :data/resource
+   ["/" :id-or-ref "/" [#".*" :path]] :data/resource})
 
 
 (def routes
-  ["" [["/" :sys/index]
-       sys-routes
-       block-routes
-       ref-routes
-       data-routes]])
+  ["" {"/"       :sys/index
+       "/sys"    sys-paths
+       "/blocks" block-paths
+       "/refs"   ref-paths
+       "/data"   data-paths}])
 
 
 
