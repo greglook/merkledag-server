@@ -1,0 +1,108 @@
+#!/bin/bash
+
+
+MERKLEDAG_SERVER=${MERKLEDAG_SERVER:-http://localhost:8080}
+
+
+fail() {
+    echo $@ >&2
+    exit 1
+}
+
+
+usage() {
+    echo "Usage: $(basename $0) <command> <action> [args...]"
+    echo
+    echo "Commands:"
+    echo "    block [list|get|store|delete]"
+    echo "    ref [list|get|set]"
+    echo "    data [get|put]"
+}
+
+
+if [[ $1 == "help" ]]; then
+    HELP=1
+    shift
+fi
+
+
+case $1 in
+    block)
+        case $2 in
+            list)
+                [[ $HELP == 1 ]] && fail "Usage: block list [query=val ...]"
+                curl $CURL_OPTS -X GET $MERKLEDAG_SERVER/blocks/
+                ;;
+
+            get)
+                # TODO: help
+                [[ -n $3 ]] || fail "Usage: block get <id>"
+                curl $CURL_OPTS -X GET $MERKLEDAG_SERVER/blocks/$3
+                ;;
+
+            store)
+                #echo "Usage: block store < input"
+                curl $CURL_OPTS -X POST $MERKLEDAG_SERVER/blocks/ \
+                    --header 'Content-Type: application/octet-stream' \
+                    --data-binary -
+                ;;
+
+            delete)
+                [[ -n $3 ]] || fail "Usage: block delete <id>"
+                ;;
+
+            *)
+                usage
+                fail "Bad block command"
+                ;;
+        esac
+        ;;
+
+    ref)
+        case $2 in
+            list)
+                [[ $HELP == 1 ]] && echo "ref list [query=val ...]"
+                fail "NYI"
+                ;;
+
+            get)
+                [[ $HELP == 1 ]] && echo "ref get <name>"
+                fail "NYI"
+                ;;
+
+            set)
+                [[ $HELP == 1 ]] && echo "ref set <name> [id]"
+                fail "NYI"
+                ;;
+
+            *)
+                usage
+                fail "Bad ref command"
+                ;;
+        esac
+        ;;
+
+    data)
+        case $2 in
+            get)
+                [[ $HELP == 1 ]] && echo "data get <id-or-name>[/path]*"
+                fail "NYI"
+                ;;
+
+            put)
+                [[ $HELP == 1 ]] && echo "data put <name>[/path]* < input"
+                fail "NYI"
+                ;;
+
+            *)
+                usage
+                fail "Bad data command"
+                ;;
+        esac
+        ;;
+
+    *)
+        usage
+        [[ $HELP == 1 ]] || fail "Bad command section"
+        ;;
+esac
