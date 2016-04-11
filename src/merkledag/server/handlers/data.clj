@@ -1,7 +1,6 @@
 (ns merkledag.server.handlers.data
   "Ring handlers for merkledag node operations."
   (:require
-    [clojure.tools.logging :as log]
     [merkledag.core :as merkle]
     [merkledag.refs :as refs]
     [merkledag.server.handlers.response :refer :all]
@@ -35,7 +34,6 @@
 (defn handle-get
   "Handles a request to retrieve node content."
   [repo request]
-  (log/debug "get params" (pr-str (:route-params request)))
   (try-request
     [route-id (:ident (:route-params request))]
     (bad-request "No root id provided")
