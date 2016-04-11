@@ -27,8 +27,8 @@
     [has-content? (pos? (:content-length request))]
     (error-response 411 :no-content "Cannot store block with no content")
 
-    (let [node (merkle/put-node! repo (:links (:body request)) (:data (:body request)))]
-      (r/redirect (data-url (:id node)) :see-other))))
+    (let [node (merkle/put-node! repo (select-keys (:body-params request) [:links :data]))]
+      (r/redirect (str (data-url (:id node))) :see-other))))
 
 
 (defn handle-get
