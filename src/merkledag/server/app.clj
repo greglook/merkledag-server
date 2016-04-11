@@ -33,7 +33,7 @@
 
 (defmethod print-method MerkleLink
   [value writer]
-  (print-method (tagged-literal 'data/link ((juxt :target :name :tsize) value)) writer))
+  (print-method (tagged-literal 'data/link ((juxt :name :target :tsize) value)) writer))
 
 
 (defmethod print-method DateTime
