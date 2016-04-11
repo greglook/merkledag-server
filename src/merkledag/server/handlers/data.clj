@@ -12,13 +12,11 @@
 
 (defn resolve-identifier
   "Resolves a string as either a valid multihash or a ref name."
-  [repo id-or-ref]
+  [repo ident]
   (try
-    (multihash/decode id-or-ref)
-    (catch Exception rex
-      (log/infof "Not a valid multihash: %s (%s)" (pr-str id-or-ref) rex)
-      (let [ref-val (refs/get-ref (:refs repo) id-or-ref)]
-        (log/infof "Ref result for %s: %s" id-or-ref (pr-str ref-val))
+    (multihash/decode ident)
+    (catch Exception _
+      (let [ref-val (refs/get-ref (:refs repo) ident)]
         (:value ref-val)))))
 
 
@@ -38,7 +36,7 @@
   [repo request]
   (log/debug "get params" (pr-str (:route-params request)))
   (try-request
-    [route-id (:id-or-ref (:route-params request))]
+    [route-id (:ident (:route-params request))]
     (bad-request "No root id provided")
 
     [root-id (resolve-identifier repo route-id)]

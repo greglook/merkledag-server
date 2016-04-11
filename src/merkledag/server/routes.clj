@@ -24,9 +24,9 @@
 
 
 (def data-paths
-  {"/"                                :data/index
-   ["/" :id-or-ref]                   :data/resource
-   ["/" :id-or-ref "/" [#".*" :path]] :data/resource})
+  {"/"                            :data/index
+   ["/" :ident]                   :data/resource
+   ["/" :ident "/" [#".*" :path]] :data/resource})
 
 
 (def routes
@@ -61,10 +61,10 @@
    (bidi/path-for routes :data/index))
   ([id]
    (bidi/path-for routes :data/resource
-                  :id (multihash/base58 id)))
+                  :ident (multihash/base58 id)))
   ([id & path]
    (bidi/path-for routes :data/resource
-                  :id (multihash/base58 id)
+                  :ident (multihash/base58 id)
                   :path (str/join "/" path))))
 
 
