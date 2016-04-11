@@ -7,14 +7,14 @@
   :deploy-branches ["master"]
 
   :dependencies
-  [[bidi "2.0.4"]
+  [[bidi "2.0.6"]
    [com.cemerick/url "0.1.1"
     :exclusions [com.cemerick/clojurescript.test]]
-   [ch.qos.logback/logback-classic "1.1.6"]
+   [ch.qos.logback/logback-classic "1.1.7"]
    [com.stuartsierra/component "0.3.1"]
    [environ "1.0.2"]
    [mvxcvi/alphabase "0.2.0"]
-   [mvxcvi/blocks "0.5.0"] ; TODO: upgrade to 0.6.1
+   [mvxcvi/blocks "0.6.1"]
    [mvxcvi/merkledag "0.2.0-SNAPSHOT"]
    [org.clojure/clojure "1.8.0"]
    [org.clojure/tools.logging "0.3.1"]
