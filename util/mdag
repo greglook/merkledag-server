@@ -16,7 +16,7 @@ usage() {
     echo "Commands:"
     echo "    block [list|get|store|delete]"
     echo "    ref [list|get|set]"
-    echo "    data [get|put]"
+    echo "    data [create|get|put]"
 }
 
 
@@ -97,6 +97,12 @@ case $1 in
 
     data)
         case $2 in
+            create)
+                [[ $HELP == 1 ]] && echo "data create [file]"
+                call_api POST /data/ \
+                    --header 'Content-Type: application/edn' \
+                    --data-binary @${3:--}
+                ;;
             get)
                 [[ $HELP == 1 ]] && echo "data get <id-or-name>[/path]*"
                 call_api GET /data/$3
