@@ -20,6 +20,15 @@ usage() {
 }
 
 
+call_api() {
+    local method=$1
+    local path=$2
+    shift 2
+    echo "API: $method $path" >&2
+    curl $CURL_OPTS -X $method ${MERKLEDAG_SERVER}${path} "$@"
+}
+
+
 if [[ $1 == "help" ]]; then
     HELP=1
     shift
@@ -30,25 +39,27 @@ case $1 in
     block)
         case $2 in
             list)
-                [[ $HELP == 1 ]] && fail "Usage: block list [query=val ...]"
-                curl $CURL_OPTS -X GET $MERKLEDAG_SERVER/blocks/
+                [[ $HELP == 1 ]] && echo "Usage: block list [query=val ...]"
+                call_api GET /blocks/
                 ;;
 
             get)
-                # TODO: help
+                [[ $HELP == 1 ]] && echo "Usage: block get <id>"
                 [[ -n $3 ]] || fail "Usage: block get <id>"
-                curl $CURL_OPTS -X GET $MERKLEDAG_SERVER/blocks/$3
+                call_api GET /blocks/$3
                 ;;
 
             store)
-                #echo "Usage: block store < input"
-                curl $CURL_OPTS -X POST $MERKLEDAG_SERVER/blocks/ \
+                [[ $HELP == 1 ]] && echo "Usage: block store [file]"
+                call_api POST /blocks/ \
                     --header 'Content-Type: application/octet-stream' \
-                    --data-binary -
+                    --data-binary @${3:--}
                 ;;
 
             delete)
+                [[ $HELP == 1 ]] && echo "Usage: block delete <id>"
                 [[ -n $3 ]] || fail "Usage: block delete <id>"
+                call_api DELETE /blocks/$3
                 ;;
 
             *)
@@ -61,18 +72,20 @@ case $1 in
     ref)
         case $2 in
             list)
-                [[ $HELP == 1 ]] && echo "ref list [query=val ...]"
-                fail "NYI"
+                [[ $HELP == 1 ]] && echo "Usage: ref list [query=val ...]"
+                call_api GET /refs/
                 ;;
 
             get)
-                [[ $HELP == 1 ]] && echo "ref get <name>"
-                fail "NYI"
+                [[ $HELP == 1 ]] && echo "Usage: ref get <name>"
+                [[ -n $3 ]] || fail "Usage: ref get <name>"
+                call_api GET /refs/$3
                 ;;
 
             set)
-                [[ $HELP == 1 ]] && echo "ref set <name> [id]"
-                fail "NYI"
+                [[ $HELP == 1 ]] && echo "ref set <name> <id>"
+                [[ -n $3 && -n $4 ]] || fail "Usage: ref set <name> <id>"
+                call_api PUT /refs/$3 --data "value=$4"
                 ;;
 
             *)
@@ -86,7 +99,7 @@ case $1 in
         case $2 in
             get)
                 [[ $HELP == 1 ]] && echo "data get <id-or-name>[/path]*"
-                fail "NYI"
+                call_api GET /data/$3
                 ;;
 
             put)
