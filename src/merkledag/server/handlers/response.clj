@@ -71,14 +71,23 @@
   the symbol bound in the `let-spec` is nil or an exception in thrown, then
   `err-form` is evaluated with the exception (if any) bound to `ex`. Otherwise,
   `body` is evaluated in the scope of the let form."
-  [let-spec err-form body]
-  `(try
-     (if-let ~let-spec
-       ~body
-       (let [~'ex nil]
-         ~err-form))
-     (catch Exception ~'ex
-       ~err-form)))
+  [[let-sym let-form] err-form body]
+  `(let [[status# value#] (try
+                            [:success ~let-form]
+                            (catch Exception ex#
+                              [:error ex#]))]
+     (cond
+       (= :error status#)
+         (let [~'ex value#]
+           ~err-form)
+
+       (some? value#)
+         (let [~let-sym value#]
+           ~body)
+
+       :default
+         (let [~'ex nil]
+           ~err-form))))
 
 
 (defmacro try-request
