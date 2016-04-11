@@ -1,11 +1,25 @@
 (ns merkledag.server.handlers.data
   "Ring handlers for merkledag node operations."
   (:require
+    [clojure.tools.logging :as log]
     [merkledag.core :as merkle]
+    [merkledag.refs :as refs]
     [merkledag.server.handlers.response :refer :all]
     [merkledag.server.routes :refer [data-url]]
     [multihash.core :as multihash]
     [ring.util.response :as r]))
+
+
+(defn resolve-identifier
+  "Resolves a string as either a valid multihash or a ref name."
+  [repo id-or-ref]
+  (try
+    (multihash/decode id-or-ref)
+    (catch Exception rex
+      (log/infof "Not a valid multihash: %s (%s)" (pr-str id-or-ref) rex)
+      (let [ref-val (refs/get-ref (:refs repo) id-or-ref)]
+        (log/infof "Ref result for %s: %s" id-or-ref (pr-str ref-val))
+        (:value ref-val)))))
 
 
 (defn handle-create!
@@ -22,19 +36,16 @@
 (defn handle-get
   "Handles a request to retrieve node content."
   [repo request]
+  (log/debug "get params" (pr-str (:route-params request)))
   (try-request
-    [id (:id (:route-params request))]
-    (bad-request "No block id provided")
+    [route-id (:id-or-ref (:route-params request))]
+    (bad-request "No root id provided")
 
-    [id (multihash/decode id)]
-    (bad-request (str "Error parsing multihash: " ex))
+    [root-id (resolve-identifier repo route-id)]
+    (bad-request (str "Root identifier is not a valid multihash or ref name: " route-id))
 
-    [node (merkle/get-node repo id)]
-    (if ex
-      (throw ex)
-      (not-found (str "Node " id " not found in Repository")))
-
-    ; TODO: something with :path?
+    [node (merkle/get-path repo root-id (:path (:route-params request)))]
+    (not-found (str "Path " (:uri request) " not found in repository"))
 
     (r/response (select-keys node [:id :size :encoding :links :data]))))
 
