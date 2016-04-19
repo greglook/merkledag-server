@@ -68,26 +68,21 @@
 
 (defmacro wrap-try
   "Combines an `if-let` and `try`/`catch` form to wrap the given assignment. If
-  the symbol bound in the `let-spec` is nil or an exception in thrown, then
+  the symbol bound in the let spec is nil or an exception in thrown, then
   `err-form` is evaluated with the exception (if any) bound to `ex`. Otherwise,
   `body` is evaluated in the scope of the let form."
   [[let-sym let-form] err-form body]
-  `(let [[status# value#] (try
-                            [:success ~let-form]
-                            (catch Exception ex#
-                              [:error ex#]))]
-     (cond
-       (= :error status#)
-         (let [~'ex value#]
-           ~err-form)
-
-       (some? value#)
-         (let [~let-sym value#]
-           ~body)
-
-       :default
-         (let [~'ex nil]
-           ~err-form))))
+  `(let [[result# value#]
+         (try
+           [:success ~let-form]
+           (catch Exception ex#
+             [:error ex#]))]
+     (if (and (= :success result#)
+              (some? value#))
+       (let [~let-sym value#]
+         ~body)
+       (let [~'ex value#]
+         ~err-form))))
 
 
 (defmacro try-request
