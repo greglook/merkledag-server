@@ -1,8 +1,6 @@
 merkledag-server
 ================
 
-**WORK IN PROGRESS**
-
 This project implements a REST API for interacting with a
 [merkledag repository](https://github.com/greglook/clj-merkledag) over HTTP.
 
@@ -46,7 +44,13 @@ POST   /data/                     Create a node by providing structured data.
 GET    /data/:id-or-ref[/:path*]  Traverse link paths to get the final node.
 PUT    /data/:ref[/:path*]        Update the node at the given path, writing new
                                   blocks up to the root. Updates the named ref.
+PATCH  /data/:ref[/:path*]        Applies some modifications to the node at the
+                                  given path.
 ```
+
+Note that there is no `DELETE` method here - in order to remove data from the
+tree, the parent node must be updated to remove the link to it. Afterwards, the
+node block can be removed directly, or may eventually be garbage-collected.
 
 ### System
 
