@@ -45,7 +45,7 @@
 
       :repo
       (component/using
-        (merkle/graph-repo :codec @merkle/block-codec)
+        (merkle/graph-repo)
         [:store :refs])
 
       :server

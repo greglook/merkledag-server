@@ -27,7 +27,7 @@
     (error-response 411 :no-content "Cannot store block with no content")
 
     (let [{:keys [links data]} (:body-params request)
-          node (merkle/put-node! repo (merkle/node links data))]
+          node (merkle/create-node! repo links data)]
       (r/redirect (str (data-url (:id node))) :see-other))))
 
 

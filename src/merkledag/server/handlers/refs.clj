@@ -45,7 +45,7 @@
     [rname (:name (:route-params request))]
     (bad-request "Missing ref name in route-params")
 
-    [history (refs/list-ref-history tracker rname)]
+    [history (refs/get-ref-history tracker rname)]
     (not-found (str "Ref " rname " not found in tracker"))
 
     (r/response {:items (vec history)})))
