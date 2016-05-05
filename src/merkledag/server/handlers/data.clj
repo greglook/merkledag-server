@@ -50,7 +50,17 @@
 (defn handle-put!
   "Handles a request to update node content."
   [repo request]
-  (throw (ex-data "Not Yet Implemented" {})))
+  (try-request
+    [has-content? (pos? (:content-length request))]
+    (error-response 411 :no-content "Cannot store block with no content")
+
+    [root-id (:ident (:route-params request))]
+    (bad-request "No root id provided")
+
+    [ref-val (:value (refs/get-ref (:refs repo) root-id))]
+    (not-found (str "Ref " root-id " not found in tracker (" ex ")"))
+
+    (throw (ex-data "Not Yet Implemented" {}))))
 
 
 

@@ -34,7 +34,7 @@
 
       :store
       (component/using
-        (let [mb #(* % 1024 1024)]
+        (let [mb (partial * 1024 1024)]
           (cache-store (mb 512)
             :max-block-size (mb 8)))
         {:primary :file-store
